@@ -1,3 +1,32 @@
+<script setup lang="ts">
+import {Gender, Length, Popularity, names} from "@/data"
+
+  interface OptionsState {
+    gender: Gender;
+    popularity: Popularity;
+    length: Length;
+  }
+
+  const options = reactive<OptionsState>({
+    gender: Gender.GIRL,
+    popularity: Popularity.UNIQUE,
+    length: Length.SHORT
+  })
+
+  const computeSelectedNames = () => {
+    const filteredNames = names
+        .filter((name) => name.gender === options.gender)
+        .filter((name) => name.popularity === options.popularity)
+        .filter((name) => {
+          if (options.length === Length.ALL) return true;
+          else return name.length === options.length;
+        });
+    selectedNames.value = filteredNames.map((name) => name.name);
+  };
+
+  const selectedNames = ref<string[]>([])
+</script>
+
 <template>
   <div class="container">
     <h1>Baby Name Generator</h1>
@@ -6,25 +35,65 @@
       <div class="option-container">
         <h4>1) Choose a gender</h4>
         <div class="option-buttons">
-          <button class="option option-left">Boy</button>
-          <button class="option">Unisex</button>
-          <button class="option option-right">Girl</button>
+          <button
+              class="option option-left"
+              :class="options.gender === 'Boy' && 'option-active'"
+              @click="options.gender = Gender.BOY"
+          >Boy</button>
+          <button
+              class="option"
+              :class="options.gender === 'Unisex' && 'option-active'"
+              @click="options.gender = Gender.UNISEX"
+          >Unisex</button>
+          <button
+              class="option option-right"
+              :class="options.gender === 'Girl' && 'option-active'"
+              @click="options.gender = Gender.GIRL"
+          >Girl</button>
         </div>
       </div>
       <div class="option-container">
         <h4>1) Choose the name's popularity</h4>
         <div class="option-buttons">
-          <button class="option option-left">Trendy</button>
-          <button class="option option-right">Unique</button>
+          <button
+              class="option option-left"
+              :class="options.popularity === 'Trendy' && 'option-active'"
+              @click="options.popularity = Popularity.TRENDY"
+          >Trendy</button>
+          <button class="option option-right"
+                  :class="options.popularity === 'Unique' && 'option-active'"
+                  @click="options.popularity = Popularity.UNIQUE"
+          >Unique</button>
         </div>
       </div>
       <div class="option-container">
         <h4>1) Choose the name's length</h4>
         <div class="option-buttons">
-          <button class="option option-left">Long</button>
-          <button class="option">All</button>
-          <button class="option option-right">Shirt</button>
+          <button
+              class="option option-left"
+              :class="options.length === 'Long' && 'option-active'"
+              @click="options.length = Length.LONG"
+          >Long</button>
+          <button
+              class="option"
+              :class="options.length === 'All' && 'option-active'"
+              @click="options.length = Length.ALL"
+          >All</button>
+          <button
+              class="option option-right"
+              :class="options.length === 'Short' && 'option-active'"
+              @click="options.length = Length.SHORT"
+          >Short</button>
        </div>
+      </div>
+      <button class="primary" @click="computeSelectedNames">
+        Find Names
+      </button>
+    </div>
+    <div class="cards-container">
+      <div v-for="name in selectedNames" :key="name" class="card">
+        {{name}}
+        <p>x</p>
       </div>
     </div>
   </div>
@@ -77,4 +146,48 @@
     border-radius: 0 1rem 1rem 0;
   }
 
+  .option-active {
+    background-color: rgb(249,87,89);
+    color: white;
+  }
+
+  .primary {
+    background-color:  rgb(249,87,89);
+    color: white;
+    border-radius: 6.5rem;
+    border: none;
+    padding: 0.75rem 4rem;
+    font-size: 1rem;
+    margin-top: 1rem;
+    cursor: pointer;
+  }
+
+  .cards-container {
+    display: flex;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    background-color: rgb(27,60,138);
+    width: 28%;
+    color: white;
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-right: 0.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .card p{
+    position: absolute;
+    top: -28%;
+    left: 92.5%;
+    cursor: pointer;
+    color: rgba(255,255,255,0.178);
+
+  }
+
 </style>
+
+
